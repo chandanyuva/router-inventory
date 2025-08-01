@@ -1,0 +1,164 @@
+<div id="routerModal" class="popup-overlay">
+    <div class="modal-container edit-mode">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <h2 class="modal-title" id="modalTitle">Router Details</h2>
+        <form id="routerDetailsForm" class="modal-form" onsubmit="submitUpdate(event)">
+            <% const readonlyAttr='disabled' ; %>
+
+                <% const textFields=["make", "model" , "category" , "ssid" , "password" , "serial_number" , "login_type"
+                    , "login_link" , "login_id" , "login_password" , "mac_blocking_type" , "blocking_steps"
+                    , "ipv6_changing_steps" ]; %>
+                    <% textFields.forEach(field=> { %>
+                        <div>
+                            <label>
+                                <%= field.replace(/_/g, ' ' ).toUpperCase() %>
+                            </label>
+                            <% if (field==='blocking_steps' || field==='ipv6_changing_steps' ) { %>
+                                <textarea name="<%= field %>" id="modal-<%= field %>" rows="2" <%=readonlyAttr
+                                    %>></textarea>
+                                <% } else if (field==='category' ) { %>
+                                    <select name="category" id="modal-category" disabled>
+                                        <option value="CAT 1">CAT 1</option>
+                                        <option value="CAT 2">CAT 2</option>
+                                        <option value="CAT 3">CAT 3</option>
+                                    </select>
+                                    <% } else { %>
+                                        <input type="text" name="<%= field %>" id="modal-<%= field %>" <%=readonlyAttr
+                                            %> />
+                                        <% } %>
+                        </div>
+                        <% }); %>
+
+                            <% const boolFields=["ipv4_support", "ipv6_support" , "open" , "wpa" , "wpa2" , "wpa3"
+                                , "wpa_wpa2" , "wpa2_wpa3" , "wifi_4" , "wifi_5" , "wifi_6" ]; %>
+                                <% boolFields.forEach(flag=> { %>
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" name="<%= flag %>" id="modal-<%= flag %>" disabled />
+                                        <label for="modal-<%= flag %>">
+                                            <%= flag.replace(/_/g, ' ' ).toUpperCase() %>
+                                        </label>
+                                    </div>
+                                    <% }); %>
+
+                                        <input type="hidden" id="modal-id" name="id" />
+
+                                        <div class="modal-actions">
+                                            <button type="button" id="editBtn" onclick="enableEdit()"
+                                                class="btn btn-edit">Edit</button>
+                                            <button type="submit" id="saveBtn" class="btn btn-save hidden">Save</button>
+                                            <button type="button" id="cancelBtn" onclick="cancelEdit()"
+                                                class="btn btn-cancel hidden">Cancel</button>
+                                        </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let originalData = {};
+
+    function openModal(data) {
+        originalData = { ...data }; // store original for cancel
+
+        const textFields = ["make", "model", "category", "ssid", "password", "serial_number", "login_type", "login_link", "login_id", "login_password", "mac_blocking_type", "blocking_steps", "ipv6_changing_steps"];
+        textFields.forEach(field => {
+            const el = document.getElementById(`modal-${field}`);
+            if (el) {
+                if (field === 'category') {
+                    el.value = data[field] || 'CAT 1';
+                } else {
+                    el.value = data[field] || '';
+                }
+            }
+        });
+
+        const boolFields = ["ipv4_support", "ipv6_support", "open", "wpa", "wpa2", "wpa3", "wpa_wpa2", "wpa2_wpa3", "wifi_4", "wifi_5", "wifi_6"];
+        boolFields.forEach(flag => {
+            const el = document.getElementById(`modal-${flag}`);
+            if (el) el.checked = !!data[flag];
+        });
+
+        document.getElementById('modal-id').value = data.id;
+
+        disableForm();
+
+        document.getElementById('routerModal').classList.remove('hidden');
+        document.getElementById('routerModal').classList.add('flex');
+    }
+
+    function closeModal() {
+        document.getElementById('routerModal').classList.add('hidden');
+        document.getElementById('routerModal').classList.remove('flex');
+        resetButtons();
+    }
+
+    function disableForm() {
+        const form = document.getElementById('routerDetailsForm');
+        [...form.elements].forEach(el => {
+            if (el.type !== 'button' && el.type !== 'submit' && el.name !== 'id') {
+                el.disabled = true;
+            }
+        });
+        resetButtons();
+    }
+
+    function enableEdit() {
+        const form = document.getElementById('routerDetailsForm');
+        [...form.elements].forEach(el => {
+            if (el.type !== 'button' && el.type !== 'submit' && el.name !== 'id') {
+                el.disabled = false;
+            }
+        });
+
+        document.getElementById('editBtn').classList.add('hidden');
+        document.getElementById('saveBtn').classList.remove('hidden');
+        document.getElementById('cancelBtn').classList.remove('hidden');
+    }
+
+    function cancelEdit() {
+        openModal(originalData); // revert inputs
+        // closeModal();            // close modal as well
+    }
+
+    async function submitUpdate(event) {
+        event.preventDefault();
+
+        const form = document.getElementById('routerDetailsForm');
+        const id = document.getElementById('modal-id').value;
+
+        const formData = new FormData(form);
+
+        const boolFields = ["ipv4_support", "ipv6_support", "open", "wpa", "wpa2", "wpa3", "wpa_wpa2", "wpa2_wpa3", "wifi_4", "wifi_5", "wifi_6"];
+        boolFields.forEach(flag => {
+            formData.set(flag, form.elements[flag].checked);
+        });
+
+        const body = {};
+        formData.forEach((val, key) => {
+            if (val === 'true') body[key] = true;
+            else if (val === 'false') body[key] = false;
+            else body[key] = val;
+        });
+
+        try {
+            const res = await fetch(`/routers/update/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if (!res.ok) throw new Error('Update failed');
+            alert('Router updated successfully!');
+            originalData = { ...body, id };
+            disableForm();
+            resetButtons();
+        } catch (err) {
+            alert('Failed to update router: ' + err.message);
+        }
+    }
+
+    function resetButtons() {
+        document.getElementById('editBtn').classList.remove('hidden');
+        document.getElementById('saveBtn').classList.add('hidden');
+        document.getElementById('cancelBtn').classList.add('hidden');
+    }
+</script>

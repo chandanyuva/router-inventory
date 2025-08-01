@@ -1,0 +1,389 @@
+/* General body and typography */
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: #f9f9f9;
+    padding: 2rem;
+    color: #333;
+    margin: 0;
+    overflow-x: hidden;
+    /* prevents body from scrolling horizontally */
+}
+
+/* Headings */
+h1,
+h2 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 2rem;
+    font-size: 2rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+}
+
+/* Buttons */
+button,
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    color: white;
+    cursor: pointer;
+    border: none;
+    transition: background 0.3s ease;
+    font-size: 1rem;
+}
+
+button:hover,
+.btn:hover {
+    filter: brightness(0.9);
+}
+
+button:disabled,
+.btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Specific button colors */
+button,
+.btn-primary {
+    background-color: #007bff;
+}
+
+button.btn-save,
+.btn-save {
+    background-color: #16a34a;
+}
+
+button.btn-cancel,
+.btn-cancel {
+    background-color: #6b7280;
+}
+
+button.btn-edit,
+.btn-edit {
+    background-color: #f59e0b;
+}
+
+button[type="submit"].btn-danger,
+form button[type="submit"] {
+    background-color: #dc3545;
+}
+
+button[type="submit"].btn-danger:hover,
+form button[type="submit"]:hover {
+    background-color: #a30017;
+}
+
+/* Links styled as buttons */
+a button {
+    display: inline-block;
+    text-decoration: none;
+}
+
+#searchBox {
+    text-align: center;
+}
+
+#resultsTable {
+    width: 100%;
+    /* use full container width, but constrain max-width */
+    max-width: 600px;
+    /* max width suitable for 4 columns */
+    margin: 2rem auto;
+    /* center horizontally with vertical margin */
+    table-layout: auto;
+    /* auto column widths based on content */
+}
+
+/* Optional: limit max width of individual cells */
+#resultsTable th,
+#resultsTable td {
+    max-width: 150px;
+    /* prevent overly wide columns */
+    white-space: nowrap;
+    /* prevent wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* show ... if text is too long */
+}
+
+/* On smaller screens, allow table to shrink */
+@media (max-width: 640px) {
+    #resultsTable {
+        max-width: 100%;
+        /* be responsive on small devices */
+    }
+}
+
+/* Table */
+
+#table-wrapper {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2rem;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 1.4rem;
+    /* allows cells to size based on content */
+    table-layout: auto;
+
+}
+
+th,
+td {
+    padding: 0.3rem;
+    text-align: left;
+    border: 1px solid #ddd;
+    word-wrap: break-word;
+    /* allow breaking long words */
+    white-space: normal;
+    /* allow line breaks */
+    /* max-width: 150px; */
+    /* optional: limit column width */
+    vertical-align: top;
+    word-wrap: break-word;
+    max-width: 120px;
+    /* cap max width per column */
+    font-size: 1rem;
+    /* smaller font helps fit more */
+    vertical-align: top;
+}
+
+th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+tr.router-row {
+    cursor: pointer;
+}
+
+tr.router-row:hover,
+tbody tr:hover {
+    background-color: #e6f0ff;
+}
+
+@media (max-width: 768px) {
+    table {
+        font-size: 0.85rem;
+    }
+
+    th,
+    td {
+        max-width: 100px;
+    }
+}
+
+/* Form inputs */
+input[type="text"],
+select,
+textarea {
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    background-color: #f3f4f6;
+    font-size: 1rem;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+/* Checkbox inputs */
+input[type="checkbox"] {
+    margin-right: 0.5rem;
+    cursor: pointer;
+}
+
+/* Disabled form controls */
+input[disabled],
+select[disabled],
+textarea[disabled] {
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+}
+
+
+/* Modal styles */
+#addRouterModal,
+#routerModal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+#addRouterModal.flex,
+#routerModal.flex {
+    display: flex;
+}
+
+.modal-container {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    max-width: 768px;
+    width: 100%;
+    padding: 1.5rem;
+    position: relative;
+    overflow-y: auto;
+    max-height: 90vh;
+    box-sizing: border-box;
+}
+
+.modal-container.edit-mode {
+    border: 2px solid #007bff;
+    background-color: #f8fbff;
+}
+
+/* Modal close button */
+.modal-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: #333;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #1f2937;
+}
+
+/* Modal form layout */
+.modal-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    font-size: 0.875rem;
+}
+
+.modal-form label {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+/* Modal form actions (buttons container) */
+.modal-actions {
+    grid-column: span 2;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+/* Checkbox group: checkbox + label in a line */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Utility classes */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Highlight for search matches */
+mark {
+    background-color: #ffff00;
+    color: black;
+}
+
+
+.modal-form input[disabled],
+.modal-form textarea[disabled],
+.modal-form select[disabled] {
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    color: #444;
+    font-weight: 500;
+    opacity: 1;
+}
+
+
+/* Style checkbox container */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    margin: 4px 0;
+}
+
+/* Hide default checkbox */
+.checkbox-group input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #007bff;
+    border-radius: 4px;
+    background-color: white;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Checked state */
+.checkbox-group input[type="checkbox"]:checked {
+    background-color: #007bff;
+}
+
+/* Checkmark */
+.checkbox-group input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    width: 4px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Disabled checkbox styling */
+.checkbox-group input[type="checkbox"][disabled] {
+    background-color: #e4e4e4;
+    border-color: #bbb;
+    cursor: not-allowed;
+}
+
+/* Disabled & checked state */
+.checkbox-group input[type="checkbox"][disabled]:checked {
+    background-color: #bbb;
+    border-color: #999;
+}
+
+/* Label */
+.checkbox-group label {
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}

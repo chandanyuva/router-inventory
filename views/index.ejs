@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IOP Routers Dashboard</title>
+    <link rel="stylesheet" href="/styles.css" />
+</head>
+
+<body>
+    <h1>IOP Routers</h1>
+
+    <!-- Search bar for fuzzy search -->
+    <div style="text-align: center; margin-bottom: 1rem;">
+        <input type="text" id="searchBox" placeholder="Type to search routers..." autocomplete="off"
+            style="width: 60%; padding: 0.5rem; font-size: 1rem;" />
+    </div>
+
+    <div style="text-align: center; margin-bottom: 1rem;">
+        <button onclick="openForm()">➕ Add Router</button>
+        <!-- <a href="/search" style="text-decoration: none; margin-left: 1rem;">
+            <button style="background-color: #28a745;">🔍 Search</button>
+        </a> -->
+    </div>
+
+    <!-- Popup Overlay -->
+    <!-- Add Router Modal -->
+    <div id="addRouterModal" class="popup-overlay">
+        <div class="modal-container">
+            <button class="modal-close" onclick="closeAddRouterModal()">×</button>
+            <h2 class="modal-title">Add New Router</h2>
+
+            <form action="/routers/add" method="POST" class="modal-form">
+                <% const seen=new Set(); %>
+                    <% columns.forEach(col=> {
+                        if (col === 'id' || seen.has(col)) return;
+                        seen.add(col);
+                        %>
+                        <div class="form-group">
+                            <% if (col==='category' ) { %>
+                                <label for="<%= col %>">Category</label>
+                                <select name="category" id="<%= col %>" required>
+                                    <option value="CAT 1">CAT 1</option>
+                                    <option value="CAT 2">CAT 2</option>
+                                    <option value="CAT 3">CAT 3</option>
+                                </select>
+                                <% } else if (['ipv4_support', 'ipv6_support' , 'open' , 'wpa' , 'wpa2' , 'wpa3'
+                                    , 'wpa_wpa2' , 'wpa2_wpa3' , 'wifi_4' , 'wifi_5' , 'wifi_6' ].includes(col)) { %>
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" name="<%= col %>" id="add-<%= col %>">
+                                        <label for="add-<%= col %>">
+                                            <%= col.replace(/_/g, ' ' ).toUpperCase() %>
+                                        </label>
+                                    </div>
+                                    <% } else if (['blocking_steps', 'ipv6_changing_steps' ].includes(col)) { %>
+                                        <label for="<%= col %>">
+                                            <%= col.replace(/_/g, ' ' ).toUpperCase() %>
+                                        </label>
+                                        <textarea name="<%= col %>" id="<%= col %>" rows="2" required></textarea>
+                                        <% } else { %>
+                                            <label for="<%= col %>">
+                                                <%= col.replace(/_/g, ' ' ).toUpperCase() %>
+                                            </label>
+                                            <input type="text" name="<%= col %>" id="<%= col %>" required>
+                                            <% } %>
+                        </div>
+                        <% }); %>
+
+                            <div class="modal-actions">
+                                <button type="submit" class="btn btn-save">Save</button>
+                                <button type="button" class="btn btn-cancel"
+                                    onclick="closeAddRouterModal()">Cancel</button>
+                            </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results table updates dynamically based on search -->
+    <div id="table-wrapper">
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <% columns.forEach(col=> { %>
+                        <th>
+                            <%= col.replace(/_/g, ' ' ).toUpperCase() %>
+                        </th>
+                        <% }) %>
+                </tr>
+            </thead>
+            <tbody id="resultsBody">
+                <% if (routers.length===0) { %>
+                    <tr>
+                        <td colspan="<%= columns.length %>">No routers found.</td>
+                    </tr>
+                    <% } else { %>
+                        <% routers.forEach(r=> { %>
+                            <tr class="router-row cursor-pointer" data-id="<%= r.id %>">
+                                <% columns.forEach(col=> { %>
+                                    <td>
+                                        <%= r[col] %>
+                                    </td>
+                                    <% }) %>
+                            </tr>
+                            <% }) %>
+                                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <%- include('partials/routerModal') %>
+
+        <script>
+
+            // Open/close Add Router Modal
+            function openForm() {
+                document.getElementById('addRouterModal').classList.add('flex');
+            }
+
+            function closeAddRouterModal() {
+                document.getElementById('addRouterModal').classList.remove('flex');
+            }
+
+            document.getElementById('addRouterModal').addEventListener('click', (e) => {
+                if (e.target.id === 'addRouterModal') closeAddRouterModal();
+            });
+
+            // Router row click to open detail modal
+            function attachRowClickHandlers() {
+                document.querySelectorAll('tr.router-row').forEach(row => {
+                    row.addEventListener('click', async () => {
+                        const id = row.dataset.id;
+                        try {
+                            const res = await fetch(`/view/api/${id}`);
+                            if (!res.ok) throw new Error('Failed to fetch router data');
+                            const data = await res.json();
+                            openModal(data);
+                        } catch (err) {
+                            alert('Error loading router data: ' + err.message);
+                        }
+                    });
+                });
+            }
+            attachRowClickHandlers();
+
+            document.getElementById('routerModal').addEventListener('click', e => {
+                if (e.target.id === 'routerModal') {
+                    closeModal();
+                }
+            });
+
+            // Fuzzy Search Setup
+            let columnsCount = 10;
+            const searchBox = document.getElementById('searchBox');
+            const resultsTable = document.getElementById('resultsTable');
+            const resultsBody = document.getElementById('resultsBody');
+
+
+            let debounceTimer = null;
+
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+
+
+
+            searchBox.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    const query = searchBox.value.trim();
+
+                    if (query.length === 0) {
+                        location.reload(); // Reloads original page, shows all columns and data
+                        return;
+                    }
+
+                    fetch(`/search/api?q=${encodeURIComponent(query)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            resultsBody.innerHTML = '';
+                            if (data.length === 0) {
+                                resultsBody.innerHTML = `<tr><td colspan="<%= columns.length + 1 %>">No routers found.</td></tr>`;
+                                return;
+                            }
+
+                            const regex = new RegExp(escapeRegExp(query), 'gi');
+
+                            data.forEach(router => {
+                                function highlight(text) {
+                                    return text.replace(regex, match => `<mark>${match}</mark>`);
+                                }
+
+                                const row = document.createElement('tr');
+                                row.classList.add('router-row', 'cursor-pointer');
+                                row.dataset.id = router.id;
+                                row.innerHTML = Object.entries(router)
+                                    // .filter(([key]) => key !== 'id') // optionally hide internal fields
+                                    .map(([key, value]) => {
+                                        const val = value == null ? '' : String(value);
+                                        return `<td>${highlight(val)}</td>`;
+                                    })
+                                    .join('');
+
+                                row.addEventListener('click', () => {
+                                    showDetails(router.id);
+                                });
+
+                                resultsBody.appendChild(row);
+                            });
+                        })
+                        .catch(err => {
+                            console.error('Search error:', err);
+                            resultsBody.innerHTML = `<tr><td colspan="<%= columns.length + 1 %>">Error fetching results.</td></tr>`;
+                        });
+                }, 150);
+            });
+
+
+            function showDetails(id) {
+                fetch(`/view/api/${id}`)
+                    .then(res => res.json())
+                    .then(router => {
+                        openModal(router);
+                    })
+                    .catch(() => {
+                        alert('Failed to load router details.');
+                    });
+            }
+        </script>
+
+
+
+</body>
+
+</html>
