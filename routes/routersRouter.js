@@ -1,6 +1,6 @@
 
 const { Router } = require("express");
-const { insertRouter, deleteRouterById, updateRouterById } = require("../db/queries.js");
+const { insertRouter, deleteRouterById, updateRouterById } = require("../public/db/queries.js");
 const routersRouter = Router();
 
 
