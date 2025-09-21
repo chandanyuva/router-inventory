@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { getRouterById } = require("../db/queries.js");
+const { getRouterById } = require("../public/db/queries.js");
 
 const viewRouter = Router();
 
