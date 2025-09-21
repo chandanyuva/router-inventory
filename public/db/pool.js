@@ -9,4 +9,6 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
 });
 
+console.log("database_url: ",process.env.DATABASE_URL,"env: ",process.env.NODE_ENV );
+
 module.exports = pool;
