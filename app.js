@@ -6,6 +6,11 @@ const routersRouter = require("./routes/routersRouter.js");
 const searchRouter = require('./routes/searchRouter');
 const viewRouter = require('./routes/viewRouter');
 
+if (process.env.NODE_ENV === "production") {
+  require("./db/initSchema");
+    require("./db/insertTestData");
+}
+
 const app = express();
 
 // ejs setup
