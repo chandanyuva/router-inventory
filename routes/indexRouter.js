@@ -1,6 +1,6 @@
 
 const { Router } = require("express");
-const { getAllRouters, getRouterColumns } = require('../db/queries.js');
+const { getAllRouters, getRouterColumns } = require('../public/db/queries.js');
 const indexRouter = Router();
 
 indexRouter.get("/", async (req, res) => {
