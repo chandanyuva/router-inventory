@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
+        "start": "node app.js",
         "init-schema": "node db/initSchema.js",
         "insert-test-data": "node db/insertTestData.js",
         "dev": "nodemon app.js"
