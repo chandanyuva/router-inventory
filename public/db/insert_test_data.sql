@@ -3,7 +3,7 @@ DECLARE
   i INT := 1;
   make_arr TEXT[] := ARRAY['TP-Link', 'Netgear', 'D-Link', 'Cisco', 'Asus'];
   model_arr TEXT[] := ARRAY['AX3000', 'N450', 'AC1750', 'XR500', 'RT-AC68U'];
-category_arr router_category[] := ARRAY['CAT 1'::router_category, 'CAT 2'::router_category, 'CAT 3'::router_category];
+  category_arr category[] := ARRAY['CAT 1'::category, 'CAT 2'::category, 'CAT 3'::category];
   login_type_arr TEXT[] := ARRAY['web', 'app', 'telnet', 'ssh'];
   mac_blocking_arr TEXT[] := ARRAY['none', 'manual', 'auto'];
 BEGIN
