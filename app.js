@@ -25,7 +25,8 @@ app.use('/search', searchRouter);
 app.use("/routers", routersRouter);
 app.use('/view', viewRouter);
 
-const PORT = 3000;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 3000;
+const HOST = 0.0.0.0;
+app.listen(PORT, HOST () => {
     console.log(`listening on port ${PORT}!`);
 });
