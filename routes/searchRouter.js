@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const pool = require("../db/pool");
+const pool = require("../public/db/pool");
 const searchRouter = Router();
 
 // Search API with ILIKE on make, model, ssid
