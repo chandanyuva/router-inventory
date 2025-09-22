@@ -7,8 +7,8 @@ const searchRouter = require('./routes/searchRouter');
 const viewRouter = require('./routes/viewRouter');
 
 if (process.env.NODE_ENV === "production") {
-  require("./public/db/initSchema");
-    require("./public/db/insertTestData");
+  require("./db/initSchema");
+    require("./db/insertTestData");
 }
 
 const app = express();
