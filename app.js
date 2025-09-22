@@ -30,7 +30,7 @@ app.use('/search', searchRouter);
 app.use("/routers", routersRouter);
 app.use('/view', viewRouter);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 const HOST = "0.0.0.0";
 app.listen(PORT, HOST ,() => {
     console.log(`listening on port ${PORT}!`);
