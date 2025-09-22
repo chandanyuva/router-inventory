@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 //This middleware tells Express: "If the incoming request has a Content-Type: application/json, parse the JSON body and assign it to req.body."
 app.use(express.json());
 
-app.use(express.static('public'))
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use("/", indexRouter);
 app.use('/search', searchRouter);
