@@ -6,9 +6,9 @@ const { Pool } = require("pg");
 // });
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL, // single env var
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+  ssl: { rejectUnauthorized: false }
 });
 
-console.log("database_url: ",process.env.DATABASE_URL,"env: ",process.env.NODE_ENV );
+// console.log("database_url: ",process.env.DATABASE_URL,"env: ",process.env.NODE_ENV );
 
 module.exports = pool;
